@@ -136,3 +136,19 @@ This is a portfolio learning project, **not** a production-ready ordering platfo
 ## Background
 
 Started as a basic console project in a university programming module and rebuilt as a separate modern Java application. This repository documents the refactoring and subsequent features. It is **a personal learning project**, not a claim of professional Java engineering employment.
+
+## API & Database — Visual Evidence
+
+### REST API — Postman
+
+The REST API successfully retrieves orders using the
+`GET /api/v1/orders` endpoint.
+
+![Postman GET Orders](docs/images/postman-get-orders.png)
+
+### PostgreSQL — Data Persistence
+
+Orders are stored in PostgreSQL and remain available
+after restarting the application.
+
+![PostgreSQL Orders](docs/images/postgresql-orders.png)
