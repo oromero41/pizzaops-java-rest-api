@@ -1,0 +1,293 @@
+{
+  "info": {
+    "name": "PizzaOps — REST API testing (Spring Boot + PostgreSQL)",
+    "description": "Positive and negative API testing for PizzaOps. Default runtime stores orders in local PostgreSQL. The separate automated test profile uses in-memory storage.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 — Menu",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/menu",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "menu"
+          ]
+        },
+        "description": "01 — Menu"
+      },
+      "response": []
+    },
+    {
+      "name": "02 — Create order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders"
+          ]
+        },
+        "description": "02 — Create order",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"size\": \"MEDIUM\",\n  \"base\": \"ORIGINAL\",\n  \"sauce\": \"TOMATO\",\n  \"cheese\": \"MOZZARELLA\",\n  \"toppings\": [\n    \"HAM\",\n    \"OLIVES\",\n    \"CHICKEN\",\n    \"BACON\",\n    \"PINEAPPLE\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"201 Created\", () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) pm.collectionVariables.set(\"orderId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Orders",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders"
+          ]
+        },
+        "description": "03 — Orders"
+      },
+      "response": []
+    },
+    {
+      "name": "04 — Order by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders",
+            "{{orderId}}"
+          ]
+        },
+        "description": "04 — Order by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "05 — Statistics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/statistics",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "statistics"
+          ]
+        },
+        "description": "05 — Statistics"
+      },
+      "response": []
+    },
+    {
+      "name": "06 — Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "health"
+          ]
+        },
+        "description": "06 — Health"
+      },
+      "response": []
+    },
+    {
+      "name": "07 — Duplicate topping (expected 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders"
+          ]
+        },
+        "description": "07 — Duplicate topping (expected 400)",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"size\": \"SMALL\",\n  \"base\": \"ORIGINAL\",\n  \"sauce\": \"TOMATO\",\n  \"cheese\": \"MOZZARELLA\",\n  \"toppings\": [\n    \"HAM\",\n    \"HAM\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"400 Invalid order\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 — Unknown order (expected 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders/999999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders",
+            "999999"
+          ]
+        },
+        "description": "08 — Unknown order (expected 404)"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"404 Not found\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 — Invalid size (expected 400 + field + options)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders"
+          ]
+        },
+        "description": "Send an unknown size. Confirm an actionable error and no order creation.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"size\": \"EXTRA_GIGANTE\",\n  \"base\": \"THIN\",\n  \"sauce\": \"BARBEQUE\",\n  \"cheese\": \"MOZZARELLA\",\n  \"toppings\": [\n    \"PEPPERONI\",\n    \"HAM\",\n    \"OLIVES\",\n    \"MUSHROOM\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"400 Bad Request\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error is actionable\", () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.error).to.eql(\"INVALID_CATALOG_VALUE\");",
+              "  pm.expect(body.field).to.eql(\"size\");",
+              "  pm.expect(body.allowedValues).to.include.members([\"SMALL\", \"MEDIUM\", \"LARGE\"]);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "orderId",
+      "value": "1"
+    }
+  ]
+}

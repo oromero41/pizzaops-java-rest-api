@@ -1,0 +1,22 @@
+# Java / Maven build outputs
+target/
+out/
+*.class
+*.log
+
+# Local editor settings
+.vscode/
+.idea/
+.settings/
+.classpath
+.project
+
+# Local credentials and generated files
+.env
+.env.*
+*.local.properties
+*.zip
+
+# System files
+.DS_Store
+Thumbs.db

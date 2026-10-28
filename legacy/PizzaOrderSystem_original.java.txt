@@ -1,0 +1,756 @@
+import java.util.Arrays;    // Importing the Arrays class for array manipulation
+import java.util.Scanner;   // Importing the Scanner class for user input
+
+// Main class representing the Pizza Order System
+public class PizzaOrderSystem {
+
+    // Variables to keep track of order numbers, counts, and statistics
+    private static int orderNum = 1;
+    private static int numberOfOrders = 0;
+    private static int[] sizeCount = new int[99]; // Small, Medium, Large
+    private static int[] baseCount = new int[99]; // Original, Thin, Thick, Stuffed
+    private static int[] sauceCount = new int[99]; // Tomato, Barbeque
+    private static int[] toppingCount = new int[99]; // Toppings
+    private static int[] cheeseCount = new int[99]; // Mozz, Lowfat, Vegan
+    private static int[] meatCount = new int[99]; // pepperoni, ham, beef, chicken, sausage, bacon
+    private static int[] vegCount = new int[99]; // pepper, olives, onions, tomato, sweetcorn, pineapple, mushroom
+    private static int totalToppings = 0;
+    
+    // Method to update the count of pizza sizes
+    private static void updateSizeCount(int[] sizeCount, int index) {
+        sizeCount[index]++;
+    }
+
+    // Method to update the count of pizza bases
+    private static void updateBaseCount(int[] baseCount, int index) {
+        baseCount[index]++;
+    }
+
+    // Method to update the count of pizza sauces
+    private static void updateSauceCount(int[] sauceCount, int index) {
+        sauceCount[index]++;
+    }
+
+    // Method to update the count of cheese types
+    private static void updateCheeseCount(int[] cheeseCount, int index) {
+        cheeseCount[index]++;
+    }
+
+    // Main method representing the entry point of the program
+public static void main(String[] args) {
+    // Scanner object to take user input
+    Scanner scanner = new Scanner(System.in);
+
+// Main loop for the pizza order system
+while (true) {
+    // Display menu options to the user
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Pizza Corner Menu:");
+    System.out.println("1. Order a pizza");
+    System.out.println("2. Provide statistics");
+    System.out.println("3. Exit");
+    System.out.println("----"); // Adds a line with dashes
+    System.out.print("Enter your choice: ");
+
+    // Validate input to ensure it's an integer
+    while (!scanner.hasNextInt()) {
+        System.out.println("Invalid input. Please enter a number (1, 2, or 3).");
+        scanner.next(); // Consume the invalid input
+    }
+
+    int choice = scanner.nextInt();
+
+    // Validate that the choice is 1, 2, or 3
+    if (choice < 1 || choice > 3) {
+        System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+        continue; // Restart the loop if the choice is invalid
+    }
+
+    // Switch statement to handle user choices
+    switch (choice) {
+        // Case 1: Order a pizza
+        case 1:
+            boolean addAnotherOrder = true; // Introduce a boolean variable
+            while (addAnotherOrder) {
+                // Display order number and process the order
+                System.out.println("----"); // Adds a line with dashes
+                System.out.println("Ordering pizza #" + (orderNum + 1)); // Display the correct order number
+                processOrder(scanner); // Call the processOrder method
+
+                numberOfOrders++; // Increment the number of orders
+
+                System.out.println("Do you want to add another order? (Y/N)");
+                String addAnotherOrderResponse = scanner.next().toUpperCase();
+                if (addAnotherOrderResponse.equals("N")) {
+                    orderNum++; // Increment orderNum only when a new pizza is ordered
+                    addAnotherOrder = false; // Exit the inner loop
+                    break; // Add this line to break out of the outer loop as well
+                }
+            }
+            break;
+
+        // Case 2: Display statistics
+        case 2:
+            displayStatistics();
+            break;
+
+        // Case 3: Exit the program
+        case 3:
+            boolean confirmExit = false;
+            while (true) {
+                System.out.println("Are you sure you want to exit? (Y/N)");
+                String exitConfirmation = scanner.next().toUpperCase();
+
+                if (exitConfirmation.equals("Y")) {
+                    confirmExit = true;
+                    break;
+                } else if (exitConfirmation.equals("N")) {
+                    break; // Exit the inner loop
+                } else {
+                    System.out.println("Invalid choice. Please enter Y or N.");
+                }
+            }
+
+            if (confirmExit) {
+                System.out.println("Thank you for your visit! Enjoy!");
+                scanner.close();
+                return; // Exit the outer loop
+            }
+            break;
+
+        default:
+            System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+            break;
+    }
+}
+
+
+
+}
+
+    // Method to process a pizza order
+    private static void processOrder(Scanner scanner) {
+    int currentOrder = orderNum;
+
+    String size = getValidSize(scanner);
+    updateSizeCount(sizeCount, sizeToIndex(size));
+
+    String base = getValidBase(scanner);
+    updateBaseCount(baseCount, baseToIndex(base));
+
+    String sauce = getValidSauce(scanner);
+    updateSauceCount(sauceCount, sauceToIndex(sauce));
+
+    int[][] allToppings = getValidToppings(scanner);
+
+    String cheese = getValidCheese(scanner);
+    updateCheeseCount(cheeseCount, cheeseToIndex(cheese));
+
+   
+    // Increment the order number before displaying details
+    orderNum++;
+
+    // Display order details using the current incremented order number
+    displayOrderDetails(currentOrder, size, base, sauce, allToppings, cheese, scanner);
+}
+
+
+
+
+
+
+
+
+// Get valid pizza size selection
+private static String getValidSize(Scanner scanner) {
+    String[] sizeOptions = {"S", "M", "L"}; // Fixed array for size options
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Available Sizes:");
+    System.out.println("S. Small");
+    System.out.println("M. Medium");
+    System.out.println("L. Large");
+    
+    while (true) {
+        System.out.print("Enter pizza size (S/M/L): ");
+        String sizeInput = scanner.next().toUpperCase();
+
+        boolean isValidSize = false;
+        for (String size : sizeOptions) {
+            if (sizeInput.equals(size)) {
+                isValidSize = true;
+                break;
+            }
+        }
+
+        if (isValidSize) {
+            return sizeInput;
+        } else {
+            System.out.println("Invalid size. Please enter S, M, or L.");
+        }
+    }
+}
+
+// Get valid pizza base selection
+private static String getValidBase(Scanner scanner) {
+    String[] baseOptions = {"1", "2", "3", "4"}; // Fixed array for base options
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Available Pizza Bases:");
+    System.out.println("1. Original");
+    System.out.println("2. Thin Crust");
+    System.out.println("3. Thick Crust");
+    System.out.println("4. Stuffed Crust (with Cheese)");
+    
+    while (true) {
+        System.out.print("Select pizza base (1-4): ");
+        String baseChoice = scanner.next();
+
+        boolean isValidBase = false;
+        for (String base : baseOptions) {
+            if (baseChoice.equals(base)) {
+                isValidBase = true;
+                break;
+            }
+        }
+
+        if (isValidBase) {
+            switch (baseChoice) {
+                case "1":
+                    System.out.println("Original base selected.");
+                    return "Original";
+                case "2":
+                    System.out.println("Thin Crust base selected.");
+                    return "Thin Crust";
+                case "3":
+                    System.out.println("Thick Crust base selected.");
+                    return "Thick Crust";
+                case "4":
+                    System.out.println("Stuffed Crust (with Cheese) base selected.");
+                    return "Stuffed Crust (with Cheese)";
+            }
+        } else {
+            System.out.println("Invalid base choice. Please select a valid base (1-4).");
+        }
+        System.out.println("----"); // Adds a line with dashes
+    }
+}
+
+// Get valid pizza sauce selection
+private static String getValidSauce(Scanner scanner) {
+    String[] sauceOptions = {"1", "2"}; // Fixed array for sauce options
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Available Pizza Sauces:");
+    System.out.println("1. Tomato");
+    System.out.println("2. Barbeque (bq)");
+
+    while (true) {
+        System.out.print("Select pizza sauce (1-2): ");
+        
+        String sauceChoice = scanner.next();
+
+        boolean isValidSauce = false;
+        for (String sauce : sauceOptions) {
+            if (sauceChoice.equals(sauce)) {
+                isValidSauce = true;
+                break;
+            }
+        }
+
+        if (isValidSauce) {
+            switch (sauceChoice) {
+                case "1":
+                    System.out.println("Tomato sauce selected.");
+                    return "Tomato";
+                case "2":
+                    System.out.println("Barbeque sauce selected.");
+                    return "Barbeque";
+            }
+            System.out.println("----"); // Adds a line with dashes
+
+        } else {
+            System.out.println("Invalid sauce choice. Please select a valid sauce (1-2).");
+        }
+    }
+}
+
+// Get valid toppings information including meat and veg toppings
+private static int[][] getValidToppings(Scanner scanner) {
+    int[][] toppingsInfo = new int[2][]; // 2D array for toppings: meat and veg
+    int[] meatToppings = new int[99];
+    int[] vegToppings = new int[99];
+    int additionalToppingCharge = 0; // Keep track of additional topping charge
+
+    // Initialize the arrays with a default value of -1
+    Arrays.fill(meatToppings, -1);
+    Arrays.fill(vegToppings, -1);
+
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Available Topping Categories:");
+    System.out.println("1. Meat");
+    System.out.println("2. Veg");
+
+    int totalMeatToppings = 0;
+    int totalVegToppings = 0;
+
+    while (true) {
+        System.out.print("Select a topping category (1-2): ");
+        if (scanner.hasNextInt()) {
+            int categoryChoice = scanner.nextInt();
+
+            if (categoryChoice == 1) {
+                totalMeatToppings = getValidMeatTopping(meatToppings, totalMeatToppings, scanner, totalMeatToppings + totalVegToppings);
+            } else if (categoryChoice == 2) {
+                totalVegToppings = getValidVegTopping(vegToppings, totalVegToppings, scanner);
+            } else {
+                System.out.println("Invalid input. Please enter 1 or 2.");
+                continue; // Restart the loop if invalid input
+            }
+
+            // Increment additional topping charge for each topping selected beyond the initial four
+            additionalToppingCharge = Math.max(0, totalMeatToppings + totalVegToppings - 4); // Charge £1 for each additional topping
+            
+            System.out.println("You have selected " + (totalMeatToppings + totalVegToppings) +
+                    " Toppings, 4 are included in any size pizza.");
+            
+            System.out.println("Additional charge: £" + additionalToppingCharge);
+
+            // Ask if the user wants to add more toppings after reaching the minimum
+            if (totalMeatToppings + totalVegToppings >= 4) {
+                System.out.println("----"); // Adds a line with dashes
+                System.out.println("Do you want to add more toppings? (Y/N)");
+                String addMoreToppings = scanner.next().toUpperCase();
+                if (addMoreToppings.equals("Y")) {
+                    // Continue the loop for more toppings
+                } else if (addMoreToppings.equals("N")) {
+                    // Exit the loop if the user doesn't want more toppings
+                    break;
+                } else {
+                    System.out.println("Invalid choice. Please enter Y or N.");
+                }
+            }
+        } else {
+            System.out.println("Invalid input. Please enter a number.");
+            scanner.next(); // Clear the invalid input
+        }
+    }
+
+    toppingsInfo[0] = Arrays.copyOfRange(meatToppings, 0, totalMeatToppings);
+    toppingsInfo[1] = Arrays.copyOfRange(vegToppings, 0, totalVegToppings);
+
+
+    int[] chargeInfo = {additionalToppingCharge, totalMeatToppings + totalVegToppings}; // Updated to track totalToppings
+    int[][] combinedInfo = {chargeInfo, toppingsInfo[0], toppingsInfo[1]};
+    return combinedInfo;
+}
+
+
+
+// Get a valid selection for a meat topping from the user input
+private static int getValidMeatTopping(int[] meatToppings, int meatCount, Scanner scanner, int totalToppings) {
+    System.out.println("----");
+    System.out.println("Select meat topping:");
+    System.out.println("1. Pepperoni");
+    System.out.println("2. Ham");
+    System.out.println("3. Beef");
+    System.out.println("4. Chicken");
+    System.out.println("5. Sausage");
+    System.out.println("6. Bacon");
+
+    int toppingChoice;
+
+    while (true) {
+        System.out.print("Enter your choice: ");
+        if (scanner.hasNextInt()) {
+            toppingChoice = scanner.nextInt();
+
+            // Validate the meat topping choice
+            if (toppingChoice >= 1 && toppingChoice <= 6) {
+                meatToppings[meatCount++] = toppingChoice; // Update the array with the topping choice
+                System.out.println("Selected Meat Topping: " + getToppingName(toppingChoice));
+                if (totalToppings >= 4) {
+                    System.out.println("Additional topping charge: £" + (totalToppings - 4));
+                }
+                break; // Break the loop after a valid choice
+            } else {
+                System.out.println("Invalid choice. Please enter a number between 1 and 6.");
+            }
+        } else {
+            System.out.println("Invalid input. Please enter a number.");
+            scanner.next(); // Clear the invalid input
+        }
+    }
+
+    return meatCount;
+}
+
+
+
+// Get a valid selection for a vegetable topping from the user input
+private static int getValidVegTopping(int[] vegToppings, int vegCount, Scanner scanner) {
+    System.out.println("----");
+    System.out.println("Select veg topping:");
+    System.out.println("7. Pepper");
+    System.out.println("8. Olives");
+    System.out.println("9. Onions");
+    System.out.println("10. Tomato");
+    System.out.println("11. Sweetcorn");
+    System.out.println("12. Pineapple");
+    System.out.println("13. Mushroom");
+
+    while (true) {
+        if (scanner.hasNextInt()) {
+            int vegToppingChoice = scanner.nextInt();
+
+            // Validate the veg topping choice
+            if (vegToppingChoice >= 7 && vegToppingChoice <= 13) {
+                vegToppings[vegCount++] = vegToppingChoice;
+                System.out.println("Selected Veg Topping: " + getToppingName(vegToppingChoice));
+                break;
+            } else {
+                System.out.println("Invalid veg topping choice. Please select a number between 7 and 13.");
+            }
+        } else {
+            System.out.println("Invalid input. Please enter a number.");
+            scanner.next(); // Clear the invalid input
+        }
+    }
+
+    return vegCount;
+}
+
+
+
+// Get a valid cheese selection from the user input
+private static String getValidCheese(Scanner scanner) {
+    String[] cheeseOptions = {"1", "2", "3"}; // Fixed array for cheese options
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Available Cheese Toppings:");
+    System.out.println("1. Mozzarella (Mozz)");
+    System.out.println("2. Lowfat");
+    System.out.println("3. Vegan");
+    
+    while (true) {
+        System.out.print("Select cheese topping (1-3): ");
+        String cheeseChoice = scanner.next();
+
+        boolean isValidCheese = false;
+        for (String cheese : cheeseOptions) {
+            if (cheeseChoice.equals(cheese)) {
+                isValidCheese = true;
+                break;
+            }
+        }
+
+        if (isValidCheese) {
+            switch (cheeseChoice) {
+                case "1":
+                    System.out.println("Mozzarella (Mozz) cheese selected.");
+                    return "Mozzarella (Mozz)";
+                case "2":
+                    System.out.println("Lowfat cheese selected.");
+                    return "Lowfat";
+                case "3":
+                    System.out.println("Vegan cheese selected.");
+                    return "Vegan";
+            }
+               System.out.println("----"); // Adds a line with dashes
+        } else {
+                System.out.println("----"); // Adds a line with dashes
+            System.out.println("Invalid cheese choice. Please select a valid cheese topping (1-3).");
+        }
+
+    }
+}
+
+
+
+
+
+
+// Display order details including pizza size, base, sauce, toppings, cheese, and additional topping charge
+private static void displayOrderDetails(int orderNum, String size, String base, String sauce, int[][] toppings, String cheese, Scanner scanner) {
+   // int totalToppings = countSelectedToppings(toppings);
+// Call the updateToppingCount method
+updateToppingCount(toppings);
+
+// Update totalToppings after additional topping charge
+//totalToppings = countSelectedToppings(toppings);
+    System.out.println("----"); // Adds a line with dashes
+    
+    // Display order details
+    System.out.println("Order Details for Pizza #" + orderNum);
+    System.out.println("Size: " + size);
+    System.out.println("Base: " + base);
+    System.out.println("Sauce: " + sauce);
+
+    // Display meat toppings
+    displayToppings("Meat Toppings", toppings[1]);
+
+    // Display veg toppings
+    displayToppings("Veg Toppings", toppings[2]);
+
+/// Calculate the additional topping charge
+//int additionalToppingCharge = calculateAdditionalToppingCharge(totalToppings);
+
+// Debugging print statements
+//System.out.println("Debug - totalToppings before calculation: " + totalToppings);
+
+// Update totalToppings after additional topping charge
+//totalToppings = countSelectedToppings(toppings);
+
+//System.out.println("Debug - additionalToppingCharge: £" + additionalToppingCharge);
+
+// Display cheese
+System.out.println("Cheese: " + cheese);
+
+// Display the correct additional topping charge
+//System.out.println("Additional Topping Charge: £" + additionalToppingCharge);
+
+System.out.println("----"); // Adds a line with dashes
+    // Ask for confirmation
+    System.out.println("Does your order look good? (Y/N)");
+
+    String confirmation = scanner.next().toUpperCase();
+
+    if (confirmation.equals("N")) {
+        // Restart the pizza creation process
+        System.out.println("Restarting pizza creation process...");
+        processOrder(scanner);
+        return; // Return after restarting the pizza creation process
+    } else if (!confirmation.equals("Y")) {
+        System.out.println("Invalid choice. Please enter Y or N.");
+        displayOrderDetails(orderNum, size, base, sauce, toppings, cheese, scanner); // Recursively call to handle invalid input
+        return;
+    }
+
+    // Check for additional orders
+    while (true) {
+        System.out.println("Do you want to add another order? (Y/N)");
+        String addAnotherOrder = scanner.next().toUpperCase();
+
+        if (addAnotherOrder.equals("Y")) {
+            processOrder(scanner);
+            return; // Return after asking for additional orders
+        } else if (addAnotherOrder.equals("N")) {
+            System.out.println("Returning to the main menu.");
+            break; // Exit the loop
+        } else {
+            System.out.println("Invalid choice. Please enter Y or N.");
+        }
+    }
+}
+
+
+
+
+
+// Helper method to display toppings
+private static void displayToppings(String category, int[] toppings) {
+    System.out.print(category + ": [");
+    boolean hasToppings = false;
+    for (int j = 0; j < toppings.length; j++) {
+        if (toppings[j] != 0) { // Check if the topping is selected
+            String toppingName = getToppingName(toppings[j]);
+            System.out.print(toppingName + ", ");
+            hasToppings = true;
+        }
+    }
+    if (hasToppings) {
+        System.out.print("\b\b");
+    }
+    System.out.println("]");
+}
+
+// Helper method to display additional toppings
+//private static void displayAdditionalToppings(int[][] toppings) {
+  //  System.out.print("Additional Toppings: [");
+    //boolean hasAdditionalToppings = false;
+    //for (int j = 2; j < toppings.length; j++) {
+      //  for (int k = 0; k < toppings[j].length; k++) {
+        //    if (toppings[j][k] != 0) { // Check if the topping is selected
+          //      String toppingName = getToppingName(toppings[j][k]);
+            //    System.out.print(toppingName + ", ");
+              //  hasAdditionalToppings = true;
+            //}
+        //}
+    //}
+    //if (hasAdditionalToppings) {
+      //  System.out.print("\b\b");
+    //}
+    //System.out.println("]");
+//}
+
+
+// Update updateToppingCount method
+private static void updateToppingCount(int[][] toppings) {
+    for (int i = 0; i < toppings.length; i++) {
+        for (int j = 0; j < toppings[i].length; j++) {
+            if (toppings[i][j] != 0) {
+                int toppingIndex = toppings[i][j] - 1;
+                toppingCount[toppingIndex]++;
+
+                // Update meat and veg counts
+                if (i == 1) { // Meat toppings category
+                    meatCount[toppingIndex]++;
+                } else if (i == 2) { // Veg toppings category
+                    vegCount[toppingIndex]++;
+                }
+            }
+        }
+    }
+}
+
+
+
+// Helper method to calculate additional topping charge
+//private static int calculateAdditionalToppingCharge(int totalToppings) {
+  //  return Math.max(0, totalToppings - 4) * 1; // Assuming £1 per additional topping
+//}
+
+// Method to get the name of a topping based on its index
+private static String getToppingName(int topping) {
+    switch (topping) {
+        case 1:
+            return "Pepperoni";
+        case 2:
+            return "Ham";
+        case 3:
+            return "Beef";
+        case 4:
+            return "Chicken";
+        case 5:
+            return "Sausage";
+        case 6:
+            return "Bacon";
+        case 7:
+            return "Pepper";
+        case 8:
+            return "Olives";
+        case 9:
+            return "Onions";
+        case 10:
+            return "Tomato";
+        case 11:
+            return "Sweetcorn";
+        case 12:
+            return "Pineapple";
+        case 13:
+            return "Mushroom";
+        default:
+            return "Unknown Topping";
+    }
+}
+
+// Method to display statistics
+private static void displayStatistics() {
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Size Frequency Count:");
+    System.out.println("Small: " + sizeCount[0]);
+    System.out.println("Medium: " + sizeCount[1]);
+    System.out.println("Large: " + sizeCount[2]);
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Base Frequency Count:");
+    System.out.println("Original: " + baseCount[0]);
+    System.out.println("Thin Crust: " + baseCount[1]);
+    System.out.println("Thick Crust: " + baseCount[2]);
+    System.out.println("Stuffed Crust (with Cheese): " + baseCount[3]);
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Sauce Frequency Count:");
+    System.out.println("Tomato: " + sauceCount[0]);
+    System.out.println("Barbeque: " + sauceCount[1]);
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Toppings Frequency Count:");
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Meat Toppings:");
+    System.out.println("Pepperoni: " + toppingCount[0]);
+    System.out.println("Ham: " + toppingCount[1]);
+    System.out.println("Beef: " + toppingCount[2]);
+    System.out.println("Chicken: " + toppingCount[3]);
+    System.out.println("Sausage: " + toppingCount[4]);
+    System.out.println("Bacon: " + toppingCount[5]);
+    System.out.println("Meat Toppings Count: " + meatCount);
+    System.out.println("----"); // Adds a line with dashes
+    // Display counts for Veg toppings
+    System.out.println("Veg Toppings:");
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Pepper: " + toppingCount[6]);
+    System.out.println("Olives: " + toppingCount[7]);
+    System.out.println("Onions: " + toppingCount[8]);
+    System.out.println("Tomato: " + toppingCount[9]);
+    System.out.println("Sweetcorn: " + toppingCount[10]);
+    System.out.println("Pineapple: " + toppingCount[11]);
+    System.out.println("Mushroom: " + toppingCount[12]);
+    System.out.println("Vegetable Toppings Count: " + vegCount);
+    System.out.println("----"); // Adds a line with dashes
+    System.out.println("Cheese Frequency Count:");
+    System.out.println("Mozzarella (Mozz): " + cheeseCount[0]);
+    System.out.println("Lowfat: " + cheeseCount[1]);
+    System.out.println("Vegan: " + cheeseCount[2]);
+    System.out.println("----"); // Adds a line with dashes
+    if (totalToppings > 0) {
+        double averageToppings = (double) totalToppings / numberOfOrders;
+        System.out.println("Average Number of Toppings: " + averageToppings);
+    } else {
+        System.out.println("No orders placed. Average toppings not applicable.");
+    }
+}
+
+// Method to convert pizza size to its corresponding index
+private static int sizeToIndex(String size) {
+    switch (size) {
+        case "S":
+            return 0; // Small
+        case "M":
+            return 1; // Medium
+        case "L":
+            return 2; // Large
+        default:
+            return -1; // Invalid size
+    }
+}
+
+// Method to convert pizza base to its corresponding index
+private static int baseToIndex(String base) {
+    switch (base) {
+        case "Original":
+            return 0;
+        case "Thin Crust":
+            return 1;
+        case "Thick Crust": 
+            return 2;
+        case "Stuffed Crust (with Cheese)":
+            return 3;
+        default:
+            System.out.println("Invalid base: " + base);
+            return -1; // Return -1 for an invalid base
+    }
+}
+
+// Method to convert pizza sauce to its corresponding index
+private static int sauceToIndex(String sauce) {
+    switch (sauce) {
+        case "Tomato":
+            return 0;
+        case "Barbeque":
+            return 1;
+        default:
+            System.out.println("Invalid sauce: " + sauce);
+            return -1;
+    }
+}
+
+// Method to convert the type of cheese to its corresponding index
+private static int cheeseToIndex(String cheese) {
+    switch (cheese) {
+        case "Mozzarella (Mozz)":
+            return 0;
+        case "Lowfat":
+            return 1;
+        case "Vegan":
+            return 2;
+        default:
+            System.out.println("Invalid cheese: " + cheese);
+            return -1; // Return -1 for an invalid cheese
+    }
+}
+}
+
