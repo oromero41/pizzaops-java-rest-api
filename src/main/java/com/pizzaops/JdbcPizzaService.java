@@ -10,13 +10,15 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 /** PostgreSQL implementation of PizzaOperations. The CLI remains in-memory. */
 public class JdbcPizzaService implements PizzaOperations {
     private final JdbcTemplate jdbc;
     private final ObjectMapper mapper;
-    private final RowMapper<PizzaOrder> orderMapper = this::readOrder;
+    @NonNull
+private final RowMapper<PizzaOrder> orderMapper = this::readOrder;
 
     public JdbcPizzaService(JdbcTemplate jdbc, ObjectMapper mapper) {
         this.jdbc = jdbc;

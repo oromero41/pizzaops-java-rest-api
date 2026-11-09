@@ -5,7 +5,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,7 +31,7 @@ class PizzaApiIntegrationTest {
 
     @Test
     void createOrderThenReadOrderAndStatistics() throws Exception {
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("""
                         {"size":"SMALL","base":"ORIGINAL","sauce":"TOMATO",
                          "cheese":"MOZZARELLA","toppings":["HAM","OLIVES","PEPPER","CHICKEN","BACON"]}
@@ -56,7 +55,7 @@ class PizzaApiIntegrationTest {
 
     @Test
     void rejectsDuplicateToppingsWithoutSaving() throws Exception {
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("""
                         {"size":"SMALL","base":"ORIGINAL","sauce":"TOMATO",
                          "cheese":"MOZZARELLA","toppings":["HAM","HAM"]}
@@ -69,13 +68,13 @@ class PizzaApiIntegrationTest {
 
     @Test
     void rejectsMissingFieldsAndUnknownEnums() throws Exception {
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("""
                         {"size":"SMALL"}
                         """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("""
                         {"size":"NOT_A_SIZE","base":"ORIGINAL","sauce":"TOMATO",
                          "cheese":"MOZZARELLA","toppings":[]}
@@ -90,7 +89,7 @@ class PizzaApiIntegrationTest {
 
     @Test
     void invalidSizeIsDescriptiveAndDoesNotSaveOrConsumeId() throws Exception {
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("""
                         {"size":"EXTRA_GIGANTE","base":"THIN","sauce":"TOMATO",
                          "cheese":"MOZZARELLA","toppings":["HAM"]}
@@ -103,7 +102,7 @@ class PizzaApiIntegrationTest {
         mvc.perform(get("/api/v1/orders"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("""
                         {"size":"LARGE","base":"THIN","sauce":"TOMATO",
                          "cheese":"MOZZARELLA","toppings":["HAM"]}
@@ -114,7 +113,7 @@ class PizzaApiIntegrationTest {
 
     @Test
     void invalidToppingReportsItsPosition() throws Exception {
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("""
                         {"size":"LARGE","base":"THIN","sauce":"TOMATO",
                          "cheese":"MOZZARELLA","toppings":["HAM","NOT_A_TOPPING"]}
@@ -127,7 +126,7 @@ class PizzaApiIntegrationTest {
 
     @Test
     void malformedJsonDoesNotSave() throws Exception {
-        mvc.perform(post("/api/v1/orders").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/orders").contentType("application/json")
                 .content("{bad json"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("INVALID_JSON"));

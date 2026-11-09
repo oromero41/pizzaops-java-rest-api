@@ -4,7 +4,6 @@ import com.pizzaops.PizzaOrder;
 import com.pizzaops.PizzaOperations;
 import com.pizzaops.PizzaStatistics;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +41,9 @@ public class PizzaApiController {
     public ResponseEntity<PizzaOrder> create(@Valid @RequestBody OrderRequest request) {
         PizzaOrder order = service.createOrder(request.size(), request.base(),
                 request.sauce(), request.cheese(), request.toppings());
-        return ResponseEntity.created(URI.create("/api/v1/orders/" + order.id())).body(order);
+        return ResponseEntity.status(201)
+        .header("Location", "/api/v1/orders/" + order.id())
+        .body(order);
     }
 
     @GetMapping("/statistics")

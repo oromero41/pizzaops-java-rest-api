@@ -89,7 +89,7 @@ public class ApiExceptionHandler {
     private static ResponseEntity<ApiError> error(HttpStatus status, String code,
                                                   String message, HttpServletRequest request,
                                                   String field, List<String> allowedValues) {
-        return ResponseEntity.status(status).body(new ApiError(
+        return ResponseEntity.status(status.value()).body(new ApiError(
                 Instant.now(), status.value(), code, message,
                 request.getRequestURI(), field, allowedValues));
     }

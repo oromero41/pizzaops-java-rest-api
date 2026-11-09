@@ -47,12 +47,12 @@ public final class PizzaService implements PizzaOperations {
         int totalCharges = 0;
 
         for (PizzaOrder order : orders) {
-            sizes.merge(order.size(), 1, Integer::sum);
-            bases.merge(order.base(), 1, Integer::sum);
-            sauces.merge(order.sauce(), 1, Integer::sum);
-            cheeses.merge(order.cheese(), 1, Integer::sum);
+            sizes.merge(order.size(), 1, (a, b) -> a + b);
+            bases.merge(order.base(), 1, (a, b) -> a + b);
+            sauces.merge(order.sauce(), 1, (a, b) -> a + b);
+            cheeses.merge(order.cheese(), 1, (a, b) -> a + b);
             for (Topping topping : order.toppings()) {
-                toppings.merge(topping, 1, Integer::sum);
+                toppings.merge(topping, 1, (a, b) -> a + b);
             }
             totalToppings += order.toppings().size();
             totalCharges += order.extraToppingChargeGbp();
