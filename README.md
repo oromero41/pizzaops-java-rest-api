@@ -1,65 +1,105 @@
-# PizzaOps — Java REST API with PostgreSQL
+# PizzaOps — Java REST API & Pizza Ordering Studio
 
-A learning and portfolio project that modernizes an introductory Java pizza-ordering console program into a small REST application with **Spring Boot**, **PostgreSQL**, and **API testing in Postman**.
+A full-stack learning and portfolio project built with **Java 21, Spring Boot, PostgreSQL, HTML, CSS, and JavaScript**. PizzaOps transforms an introductory university console application into an interactive pizza-ordering demo backed by a REST API and a relational database.
 
-The focus is on skills relevant to **Application Support / Technical Support Engineering**: troubleshooting HTTP requests, validating input, querying databases, examining failures, and documenting resolutions.
+The project focuses on practical skills relevant to **Application Support, Production Support, Technical Operations, and Technical Support Engineering**: working with HTTP APIs, validating requests, investigating errors, querying SQL data, testing integrations, and documenting incidents.
 
-> **Status:** Java REST API and local PostgreSQL persistence manually verified. Local Postman requests (201, 200 and descriptive 400) were also verified. Automated test workflow is included; verify its result on GitHub after publishing.
+> **Current status:** Responsive web interface running locally; order creation and PostgreSQL persistence manually verified. **9 automated tests passing** (0 failures, 0 errors) in the latest local Maven run. Public cloud deployment is not yet available.
 
-## Features currently implemented
+## PizzaOps Studio — Web Interface
 
-- `GET` endpoints for catalog, orders, one order, statistics, and health.
-- `POST` endpoint to create an order from JSON.
-- Input validation (required fields, known menu choices, duplicate toppings).
-- Structured HTTP error responses, including invalid field and allowed values.
-- Persistent orders stored in PostgreSQL via Spring JDBC (`JdbcTemplate`) with JSONB toppings.
-- JUnit / Spring MVC automated tests configured with an isolated in-memory test service.
-- Postman collection with positive and negative test examples.
-- CLI program preserved separately; its orders remain in-memory.
+![PizzaOps Studio: interactive pizza builder and successful demo order](docs/images/pizzaops-studio.png)
+
+The browser-based demo lets users:
+
+- Select a pizza size, crust, sauce, and cheese from the live API catalog.
+- Choose from 13 toppings, grouped into meat and vegetable options.
+- See a live order summary and topping charges before submitting.
+- Create a demo order via `POST /api/v1/orders` and open its JSON response using the generated order ID.
+
+**Pricing scope:** The first four toppings are included; each additional topping adds **£1**. Base pizza prices, payments, and deliveries are **not implemented**. This is a technical demo, not a commercial ordering service.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-    A[Postman / HTTP client] -->|GET / POST, JSON| B[Spring Boot REST controller]
-    B --> C[Order validation & business logic]
-    C --> D[Spring JDBC / JdbcTemplate]
-    D --> E[(PostgreSQL: orders table)]
-    B --> F[Structured HTTP responses]
-    B --> G[Spring Boot Actuator: health]
+    Browser[PizzaOps Studio - HTML / CSS / JavaScript] -->|GET menu / POST orders| API[Spring Boot REST API]
+    Postman[Postman API tests] -->|HTTP / JSON| API
+    API --> Validation[Request validation and business logic]
+    Validation --> JDBC[Spring JDBC - JdbcTemplate]
+    JDBC --> DB[(PostgreSQL - orders table / JSONB toppings)]
+    API --> Responses[JSON responses and structured HTTP errors]
+    Health[Actuator health endpoint] --- API
 ```
 
-More details: [Architecture](docs/architecture.md).
+Spring Boot also serves the frontend assets from `src/main/resources/static/`, so the local web interface and API run on the same origin.
 
-## Technology stack
+More detail: [Architecture documentation](docs/architecture.md).
 
-- Java 21
-- Spring Boot 3.5.x, Maven
-- Spring Web, Bean Validation, Spring JDBC and Actuator
-- PostgreSQL 18, SQL, JSONB
-- Postman, JUnit 5, Spring MVC testing
-- GitHub Actions workflow included (validate its status after publishing)
+## Technology Stack
 
-## Run locally on Windows
+| Area | Technologies |
+| --- | --- |
+| Backend | Java 21, Spring Boot 3.5.x, Maven |
+| Web frontend | HTML, CSS, vanilla JavaScript |
+| REST API | Spring Web, Bean Validation, JSON |
+| Database | PostgreSQL, SQL, Spring JDBC (`JdbcTemplate`), JSONB |
+| Diagnostics | Spring Boot Actuator, structured HTTP error responses |
+| Testing | JUnit 5, Spring MVC / MockMvc, Postman |
+| CI | GitHub Actions — Maven verification on push and pull request |
 
-Prerequisites: **JDK 21** and **PostgreSQL** running on `localhost:5432`.
+## Run Locally (Windows)
 
-1. Create a PostgreSQL database named `pizzaops`.
-2. Run the included [`sql/schema.sql`](sql/schema.sql) in pgAdmin (connected to `pizzaops`).
-3. Open the project root in VS Code.
-4. In a PowerShell terminal, start the API:
+**Prerequisites:** JDK 21 and a local PostgreSQL server accessible at `localhost:5432`.
+
+1. Create a PostgreSQL database called `pizzaops`.
+2. Run [`sql/schema.sql`](sql/schema.sql) against that database using pgAdmin or another PostgreSQL SQL client.
+3. Open this repository's root directory in VS Code.
+4. Start the application in PowerShell:
 
    ```powershell
    .\scripts\run-api.ps1
    ```
 
-   The script asks for the PostgreSQL password when needed. **Never put it into source files, screenshots, commits or documentation.**
-5. Look for `Started PizzaOpsApplication`. The API listens on `http://localhost:8080`.
+5. Enter the PostgreSQL password if prompted. Do **not** store credentials in source files, screenshots, commits, or documentation.
+6. When the terminal shows `Started PizzaOpsApplication`, open **http://localhost:8080/**.
 
-### Example API request
+The application runs locally on port `8080`. Leave the server terminal open while testing the demo.
+
+### Run Automated Tests
+
+From the repository root:
+
+```powershell
+.\scripts\maven.ps1 verify
+```
+
+**Latest verified local result (16 November 2026):**
+
+```text
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
+
+These tests use the isolated Spring `test` profile and an **in-memory service**, not a live PostgreSQL database. Database persistence has been checked separately with manual API requests and SQL queries. The [GitHub Actions workflow](.github/workflows/ci.yml) runs Maven verification on pushes and pull requests.
+
+## REST API Endpoints
+
+| Method | Endpoint | Purpose | Typical status |
+| --- | --- | --- | --- |
+| `GET` | `/api/v1/menu` | Read pizza options | `200` |
+| `POST` | `/api/v1/orders` | Create an order | `201` |
+| `GET` | `/api/v1/orders` | List saved orders | `200` |
+| `GET` | `/api/v1/orders/{id}` | Retrieve a specific order | `200` |
+| `GET` | `/api/v1/statistics` | Read order statistics | `200` |
+| `GET` | `/actuator/health` | Basic application health endpoint | `200` when healthy |
+
+`PUT` and `DELETE` order endpoints are **not implemented**.
+
+### Example: Create an Order
 
 ```http
-POST http://localhost:8080/api/v1/orders
+POST /api/v1/orders HTTP/1.1
 Content-Type: application/json
 ```
 
@@ -73,13 +113,9 @@ Content-Type: application/json
 }
 ```
 
-Expected response: `201 Created`, with an order ID. To retrieve it:
+A valid request returns **`201 Created`**, the new order data, and a `Location` response header. Retrieve the saved order with `GET /api/v1/orders/{id}`.
 
-```http
-GET http://localhost:8080/api/v1/orders
-```
-
-In pgAdmin, verify persistence:
+Check the database directly:
 
 ```sql
 SELECT id, size, base, toppings, created_at
@@ -87,24 +123,11 @@ FROM orders
 ORDER BY id DESC;
 ```
 
-Stop/restart the Spring Boot API and run the `GET` again. Persisted records should remain.
+Saved orders remain available after restarting Spring Boot, as long as the same PostgreSQL database is used.
 
-## API routes
+## Troubleshooting & Negative Testing
 
-| Method | Endpoint | Purpose | Typical success status |
-|---|---|---|---|
-| GET | `/api/v1/menu` | Available catalog options | 200 |
-| POST | `/api/v1/orders` | Create an order | 201 |
-| GET | `/api/v1/orders` | List orders | 200 |
-| GET | `/api/v1/orders/{id}` | Retrieve one order | 200 |
-| GET | `/api/v1/statistics` | Summary of confirmed orders | 200 |
-| GET | `/actuator/health` | Application health | 200 |
-
-**Note:** Order updates (`PUT`) and deletes (`DELETE`) are **not implemented**.
-
-## Negative testing / diagnostics
-
-Sending an invalid catalog value, such as `"size": "EXTRA_GIGANTE"`, returns `400 Bad Request` with an actionable error:
+PizzaOps validates required fields, catalog selections, and duplicate toppings. For example, an unknown pizza size returns **`400 Bad Request`** with the invalid field and the allowed values:
 
 ```json
 {
@@ -115,40 +138,35 @@ Sending an invalid catalog value, such as `"size": "EXTRA_GIGANTE"`, returns `40
 }
 ```
 
-The actual response also contains a timestamp, explanation and request path. An invalid request does not insert a new order.
+*Shown above is an excerpt of the error payload; the actual response also includes additional diagnostic fields.* Invalid requests do not create orders.
 
-See [API test cases](docs/api-testing.md) and [real troubleshooting cases](docs/troubleshooting.md).
+A practical failure investigated during development was **`FATAL: password authentication failed for user "postgres"`**, which caused HTTP `500` on order submission. The issue was traced to an incorrect database password in the local environment, corrected without changing the frontend or API logic, and verified by successfully creating another order.
 
-## Automated tests
+Read more:
+- [API test cases and Postman checks](docs/api-testing.md)
+- [Troubleshooting notes](docs/troubleshooting.md)
+- [Postman collection](postman/PizzaOps_2_0.postman_collection.json)
 
-On Windows:
+**Operational note:** A healthy application endpoint alone does not prove that PostgreSQL credentials or order persistence work. Validate the database path with an actual order request and SQL query.
 
-```powershell
-.\scripts\test-api.ps1
-```
-
-The automated API tests use a `test` profile with in-memory storage. They **do not** validate integration against a live PostgreSQL instance; manual Postman + pgAdmin checks were used for that. The GitHub Actions workflow runs Maven tests on each push and pull request.
-
-## Project boundaries / next steps
-
-This is a portfolio learning project, **not** a production-ready ordering platform. It currently has **no user authentication, RBAC, cloud deployment, frontend, schema migrations or automated live-PostgreSQL integration tests**. Planned improvements include a dedicated least-privileged database user, DB integration tests and operational logging.
-
-## Background
-
-Started as a basic console project in a university programming module and rebuilt as a separate modern Java application. This repository documents the refactoring and subsequent features. It is **a personal learning project**, not a claim of professional Java engineering employment.
-
-## API & Database — Visual Evidence
+## Evidence — API & Database
 
 ### REST API — Postman
 
-The REST API successfully retrieves orders using the
-`GET /api/v1/orders` endpoint.
+![Postman GET orders response](docs/images/postman-get-orders.png)
 
-![Postman GET Orders](docs/images/postman-get-orders.png)
+### PostgreSQL — Persistent Orders
 
-### PostgreSQL — Data Persistence
+![PostgreSQL orders in pgAdmin](docs/images/postgresql-orders.png)
 
-Orders are stored in PostgreSQL and remain available
-after restarting the application.
+## Limitations & Roadmap
 
-![PostgreSQL Orders](docs/images/postgresql-orders.png)
+PizzaOps is a **personal learning and portfolio project**, not a production-ready service. It currently has no authentication or role-based access control, payment processing, public cloud deployment, database schema migration system, or automated integration tests against a live PostgreSQL instance.
+
+Potential next steps include **Docker-based deployment, a free public demo, stronger operational logging/monitoring, a least-privileged database account, and PostgreSQL integration tests**. These are planned improvements, **not completed features**.
+
+## Project Background
+
+PizzaOps began as an introductory university Java console program and was progressively rebuilt as a separate Spring Boot project. The original CLI was preserved in the repository's legacy material; it uses in-memory state rather than PostgreSQL.
+
+All work documented here is **personal project experience**, not a claim of professional Java engineering employment.
