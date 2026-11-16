@@ -1,48 +1,47 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PizzaOps | Build Your Pizza</title>
-    <link rel="stylesheet" href="/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171513">
+  <meta name="description" content="PizzaOps: build a pizza and explore a real Java Spring Boot REST API demo.">
+  <title>PizzaOps — Your pizza, your call</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
 </head>
 <body>
-    <header>
-        <h1>🍕 PizzaOps</h1>
-        <p>Fresh pizzas. Smart operations.</p>
+  <div class="app-frame">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="PizzaOps home">
+        <span class="brand-mark" aria-hidden="true">P<span>.</span></span>
+        <span class="brand-word">PIZZA<span>OPS</span></span>
+      </a>
+      <span class="header-divider" aria-hidden="true"></span>
+      <span class="header-tagline">Craft your order. See the tech.</span>
+      <div class="header-right">
+        <span class="demo-label">INTERACTIVE DEMO</span>
+        <span id="api-status" class="connection-status is-connecting" role="status" aria-live="polite"><i aria-hidden="true"></i> Connecting kitchen...</span>
+      </div>
     </header>
 
-
-    <main>
-        <div class="hero">
-            <div class="hero-copy">
-                <span class="eyebrow">WELCOME TO PIZZAOPS</span>
-                <h2>Great pizza.<br><em>Smart technology.</em></h2>
-                <p>
-                    Create your perfect pizza with our interactive
-                    kitchen, powered by Java and Spring Boot.
-                </p>
-                <a class="hero-button" href="#builder">
-                    🍕 Build Your Pizza
-                </a>
-            </div>
-
-            <div class="hero-art" aria-hidden="true">
-                <div class="pizza-preview">🍕</div>
-                <span>MADE YOUR WAY</span>
-            </div>
+    <main class="app-main">
+      <div class="intro">
+        <div>
+          <span class="overline">THE PIZZA LAB / EST. 2026</span>
+          <h1>Make it <em>yours.</em></h1>
         </div>
-
-        <section id="builder">
-            <h2>Create Your Pizza</h2>
-            <p>Fresh ingredients. Your combination.</p>
-            <p id="api-status">Connecting to the kitchen...</p>
-        </section>
+        <p>Pick your favourites. We handle the rest.<br><span>Four toppings included, endless possibilities.</span></p>
+      </div>
+      <section id="builder" aria-label="Pizza ordering studio">
+        <div id="builder-loading" class="loading-card">
+          <span class="loading-disc" aria-hidden="true">◌</span>
+          <div><strong>Heating up the kitchen...</strong><p>The menu will appear when the server is ready.</p></div>
+          <button id="retry-menu" type="button" hidden>Retry connection</button>
+        </div>
+      </section>
     </main>
 
-
-    <script src="/app.js"></script>
-
+    <footer class="site-footer"><span>PizzaOps / Technical portfolio project</span><span>Java 21 · Spring Boot · REST API · PostgreSQL</span></footer>
+  </div>
 </body>
 </html>
